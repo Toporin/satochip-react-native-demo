@@ -14,7 +14,7 @@
     "@react-navigation/material-top-tabs": "^6.2.2",
     "@react-navigation/native": "^6.0.11",
     "@react-navigation/native-stack": "^6.7.0",
-    "cktap-protocol-react-native": "git+https://github.com/bithyve/cktap-protocol-react-native.git#main",
+    "cktap-protocol-react-native": "file:/home/satochip/Documents/goose/cktap-protocol-react-native",
     "console-browserify": "^1.2.0",
     "path-browserify": "0.0.0",
     "process": "^0.11.10",
@@ -33,10 +33,12 @@
     "react-native-tab-view": "^3.1.1",
     "react-native-udp": "4.1.5",
     "rn-nodeify": "^10.3.0",
+    "satochip-react-native": "file:/home/satochip/Documents/goose/satochip-react-native",
     "stream-browserify": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
+    "@babel/plugin-transform-export-namespace-from": "^7.27.1",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
     "@types/jest": "^26.0.23",
