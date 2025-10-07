@@ -8,7 +8,8 @@ import {
 import React, { useContext } from 'react';
 
 import { AppContext } from '../contexts/AppContext';
-import { CKTapCard } from 'cktap-protocol-react-native';
+//import { CKTapCard } from 'cktap-protocol-react-native';
+import { CKTapCard } from 'satochip-react-native';
 import InputBox from './InputBox';
 
 const COMMANDS = [

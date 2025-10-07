@@ -8,7 +8,8 @@ import {
   View,
 } from 'react-native';
 
-import { CKTapCard } from 'cktap-protocol-react-native';
+//import { CKTapCard } from 'cktap-protocol-react-native';
+import { CKTapCard } from 'satochip-react-native';
 import Card from '../components/Card';
 import NfcPrompt from '../components/NfcPromptAndroid';
 import { _setStatus } from '../utils.ts/commandUtils';
