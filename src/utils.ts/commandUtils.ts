@@ -3,7 +3,7 @@ export const _setStatus = (
   callback: string,
   isError: boolean = false,
   setStatus: any,
-  type: 'TAPSIGNER' | 'SATSCARD'
+  type: 'TAPSIGNER' | 'SATSCARD' | 'SATOCHIP'
 ) => {
   const meta = {
     type,

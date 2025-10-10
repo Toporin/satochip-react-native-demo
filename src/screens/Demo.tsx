@@ -8,12 +8,11 @@ import {
   View,
 } from 'react-native';
 
-//import { CKTapCard } from 'cktap-protocol-react-native';
-import { CKTapCard } from 'satochip-react-native';
 import Card from '../components/Card';
 import NfcPrompt from '../components/NfcPromptAndroid';
 import { _setStatus } from '../utils.ts/commandUtils';
 import { useTheme } from '@react-navigation/native';
+import { CardDetector, CardType } from '../utils.ts/cardDetector';
 
 const Footer = () => {
   return (
@@ -22,10 +21,12 @@ const Footer = () => {
     </View>
   );
 };
+
 const Demo = () => {
-  const [isTapsigner, setTapsigner] = useState<boolean | null>(null);
+  const [cardType, setCardType] = useState<CardType>(null);
   const [status, setStatus] = useState<any>();
-  const card = useRef(new CKTapCard()).current;
+  const [currentCard, setCurrentCard] = useState<any>(null);
+  const cardDetector = useRef(new CardDetector()).current;
   const [prompt, setPrompt] = React.useState<boolean>(false);
 
   const ignoreCommand = () => {
@@ -35,19 +36,28 @@ const Demo = () => {
       'none',
       false,
       setStatus,
-      isTapsigner ? 'TAPSIGNER' : 'SATSCARD'
+      cardType || 'SATSCARD'
     );
   };
 
   const withModal = async (callback: any, command: string) => {
     try {
-      const resp = await card.nfcWrapper(callback);
+      let resp;
+      
+      if (cardType === 'SATOCHIP') {
+        // For Satochip, use its own nfcWrapper
+        resp = await currentCard.nfcWrapper(callback);
+      } else {
+        // For CKTap cards (Satscard/Tapsigner), use the existing wrapper
+        resp = await currentCard.nfcWrapper(callback);
+      }
+      
       _setStatus(
         resp,
         command,
         false,
         setStatus,
-        isTapsigner ? 'TAPSIGNER' : 'SATSCARD'
+        cardType || 'SATSCARD'
       );
       return resp;
     } catch (error: any) {
@@ -59,7 +69,7 @@ const Demo = () => {
         command,
         true,
         setStatus,
-        isTapsigner ? 'TAPSIGNER' : 'SATSCARD'
+        cardType || 'SATSCARD'
       );
     }
   };
@@ -70,21 +80,55 @@ const Demo = () => {
       '',
       false,
       setStatus,
-      isTapsigner ? 'TAPSIGNER' : 'SATSCARD'
+      cardType || 'SATSCARD'
     );
-    setTapsigner(null);
-    await card.endNfcSession();
+    setCardType(null);
+    setCurrentCard(null);
+    await cardDetector.endNfcSession();
     initiate();
   };
 
   const initiate = async () => {
     setPrompt(true);
-    await withModal(async () => {
-      const selectedCard = await card.first_look();
-      setTapsigner(selectedCard!.is_tapsigner);
-      return selectedCard;
-    }, 'check-status');
-    setPrompt(false);
+    
+    try {
+      const result = await cardDetector.nfcWrapper(async () => {
+        return await cardDetector.detectCard();
+      });
+
+      if (result.cardType) {
+        setCardType(result.cardType);
+        setCurrentCard(result.card);
+        _setStatus(
+          result.rawResponse,
+          'check-status',
+          false,
+          setStatus,
+          result.cardType
+        );
+      } else {
+        _setStatus(
+          'No supported card detected',
+          'check-status',
+          true,
+          setStatus,
+          'SATSCARD'
+        );
+      }
+    } catch (error: any) {
+      if (error.toString() === 'Error') {
+        return;
+      }
+      _setStatus(
+        error.toString(),
+        'check-status',
+        true,
+        setStatus,
+        'SATSCARD'
+      );
+    } finally {
+      setPrompt(false);
+    }
   };
 
   useEffect(() => {
@@ -94,6 +138,13 @@ const Demo = () => {
   }, []);
 
   const theme = useTheme();
+  
+  const getWaitingMessage = () => {
+    return cardType === null ? 
+      'Waiting for a card to be scanned...' : 
+      'Card detected. Processing...';
+  };
+
   return (
     <>
       <StatusBar
@@ -104,19 +155,19 @@ const Demo = () => {
         <ScrollView
           contentContainerStyle={styles.container}
           keyboardShouldPersistTaps={'always'}>
-          {isTapsigner === null ? (
+          {cardType === null || currentCard === null ? (
             <View style={styles.container}>
               <Text style={styles.text}>
-                Waiting for a card to be scanned...
+                {getWaitingMessage()}
               </Text>
             </View>
           ) : (
             <View style={styles.container}>
               <Card
-                card={card}
-                status={status}
-                isTapsigner={isTapsigner}
+                cardType={cardType}
+                card={currentCard}
                 withModal={withModal}
+                status={status}
                 startOver={startOver}
               />
             </View>
