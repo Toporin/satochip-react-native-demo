@@ -14,6 +14,8 @@ import InputBox from './InputBox';
 
 const COMMANDS = [
     'get-status',
+    'change-pin',
+    'verify-pin',
 //   'check-status',
 //   'verify-certs',
 //   'slot-usage',
@@ -49,6 +51,21 @@ const SatochipCommands = ({
   const interact = (cmd = '') => {
     const name = cmd ? cmd : callback;
     switch (name) {
+      case 'change-pin':
+        withModal(
+          () => card.changePIN(0, inputs.get('old_pin'), inputs.get('new_pin')),
+          name
+        );
+        cleanup();
+        break;
+
+      case 'verify-pin':
+        withModal(
+          () => card.verifyPIN(0, inputs.get('pin')),
+          name
+        );
+        cleanup();
+        break;
 //       case 'setup-slot':
 //         withModal(
 //           () => card.setup(inputs.get('cvc') || cvc, undefined, true),
@@ -148,6 +165,12 @@ const SatochipCommands = ({
           }, name);
           break;
 
+      case 'change-pin':
+        getInputs('change-pin', ['old_pin', 'new_pin']);
+        break;
+      case 'verify-pin':
+        getInputs('verify-pin', ['pin']);
+        break;
       case 'check-status':
         withModal(() => card.first_look(), name);
         break;

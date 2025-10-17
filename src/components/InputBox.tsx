@@ -56,13 +56,17 @@ const InputBox = ({
                 autoFocus={!!!index}
                 key={item}
                 style={styles.input}
-                placeholder={`${item} ${
+                placeholder={`${
+                  item === 'old_pin' ? 'Current PIN' :
+                  item === 'new_pin' ? 'New PIN' :
+                  item
+                } ${
                   OPTIONAL_INPUT.includes(item) ||
                   (command === 'slot-usage' && item === 'cvc') ||
                   (command === 'address' && item === 'slot') ||
                   command === 'get-pubkey' ||
                   command === 'verify-certs'
-                    ? '(optinal)'
+                    ? '(optional)'
                     : ''
                 }`}
                 placeholderTextColor={'#aaa'}
@@ -76,6 +80,7 @@ const InputBox = ({
                 keyboardType={
                   ['cvc', 'slot'].includes(item) ? 'numeric' : 'default'
                 }
+                secureTextEntry={['pin', 'old_pin', 'new_pin'].includes(item)}
               />
             );
           })}

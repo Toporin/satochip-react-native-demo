@@ -7,7 +7,7 @@ const Satochip = ({ withModal, card, status, startOver }: any) => {
   return (
     <>
       <Image
-        source={require('../assets/satscard-front.png')}
+        source={require('../assets/satochip-card.png')}
         style={{ width: 571 / 2.5, height: 360 / 2.5 }}
       />
       <StatusDetails status={status} />
