@@ -16,6 +16,7 @@ const COMMANDS = [
     'get-status',
     'change-pin',
     'verify-pin',
+    'get-authentikey',
 //   'check-status',
 //   'verify-certs',
 //   'slot-usage',
@@ -66,6 +67,14 @@ const SatochipCommands = ({
         );
         cleanup();
         break;
+//       case 'get-authentikey':
+//         withModal(
+//           () => card.getAuthentikey(),
+//           name
+//         );
+//         cleanup();
+//         break;
+
 //       case 'setup-slot':
 //         withModal(
 //           () => card.setup(inputs.get('cvc') || cvc, undefined, true),
@@ -171,9 +180,22 @@ const SatochipCommands = ({
       case 'verify-pin':
         getInputs('verify-pin', ['pin']);
         break;
+
+      case 'get-authentikey':
+        withModal(async () => {
+          const authentikey = await card.getAuthentikey();
+          return authentikey.getPublicKeyBytes().toString('hex'); //"TEST GET-AUTHENTIKEY"; //
+        }, name);
+        break;
+
       case 'check-status':
         withModal(() => card.first_look(), name);
         break;
+
+
+
+
+
       case 'verify-certs':
         withModal(async () => {
           if (card.applet_version !== '0.9.0') {
