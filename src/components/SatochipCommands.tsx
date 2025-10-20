@@ -17,6 +17,7 @@ const COMMANDS = [
     'change-pin',
     'verify-pin',
     'get-authentikey',
+    'get-extendedkey',
 //   'check-status',
 //   'verify-certs',
 //   'slot-usage',
@@ -67,6 +68,27 @@ const SatochipCommands = ({
         );
         cleanup();
         break;
+
+      case 'get-extendedkey':
+//         withModal(
+//           () => card.getExtendedKey(inputs.get('path')),
+//           name
+//         );
+        withModal(async () => {
+          let path = inputs.get('path') ?? `m/44'/0'/0'/0`;
+          console.log(`SatochipCommands get-extendedkey path: ${path}`)
+          const {pubkey, chaincode} = await card.getExtendedKey(path);
+          console.log(`SatochipCommands get-extendedkey pubkey: ${pubkey.toString('hex')}`)
+          console.log(`SatochipCommands get-extendedkey chaincode: ${chaincode.toString('hex')}`)
+          return `Pubkey: ${pubkey.toString('hex')} \nChaincode: ${chaincode.toString('hex')}`;
+          //return `Pubkey: ${pubkey.toString('hex')}`;
+        }, name);
+
+        cleanup();
+        break;
+
+
+
 //       case 'get-authentikey':
 //         withModal(
 //           () => card.getAuthentikey(),
@@ -188,13 +210,16 @@ const SatochipCommands = ({
         }, name);
         break;
 
-      case 'check-status':
-        withModal(() => card.first_look(), name);
+      case 'get-extendedkey':
+        getInputs('get-extendedkey', ['path']);
         break;
 
 
 
-
+      //// TODO REMOVE
+      case 'check-status':
+        withModal(() => card.first_look(), name);
+        break;
 
       case 'verify-certs':
         withModal(async () => {
