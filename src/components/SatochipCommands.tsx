@@ -6,6 +6,7 @@ import {
   View,
 } from 'react-native';
 import React, { useContext } from 'react';
+import * as bip39 from 'bip39';
 
 import { AppContext } from '../contexts/AppContext';
 //import { CKTapCard } from 'cktap-protocol-react-native';
@@ -18,6 +19,8 @@ const COMMANDS = [
     'verify-pin',
     'get-authentikey',
     'get-extendedkey',
+    'import-seed',
+    'reset-seed',
 //   'check-status',
 //   'verify-certs',
 //   'slot-usage',
@@ -62,20 +65,16 @@ const SatochipCommands = ({
         break;
 
       case 'verify-pin':
-        withModal(
-          () => card.verifyPIN(0, inputs.get('pin')),
-          name
-        );
+        withModal(async () => {
+          card.verifyPIN(0, inputs.get('pin'));
+          return `PIN verified successfully!`
+        }, name);
         cleanup();
         break;
 
       case 'get-extendedkey':
-//         withModal(
-//           () => card.getExtendedKey(inputs.get('path')),
-//           name
-//         );
         withModal(async () => {
-          let path = inputs.get('path') ?? `m/44'/0'/0'/0`;
+          let path = inputs.get('path') ?? `m/44'/0'/0'/0/0`;
           console.log(`SatochipCommands get-extendedkey path: ${path}`)
           const {pubkey, chaincode} = await card.getExtendedKey(path);
           console.log(`SatochipCommands get-extendedkey pubkey: ${pubkey.toString('hex')}`)
@@ -86,6 +85,47 @@ const SatochipCommands = ({
 
         cleanup();
         break;
+
+      case 'import-seed':
+        withModal(async () => {
+          const mnemonic = inputs.get('mnemonic');
+          const passphrase = inputs.get('passphrase') ?? '';
+          console.log(`SatochipCommands get-extendedkey mnemonic: ${mnemonic}`)
+          console.log(`SatochipCommands get-extendedkey passphrase: ${passphrase}`)
+
+          // Validate mnemonic
+          console.log(`SatochipCommands import-seed checking mnemonic validity...`)
+          if (!bip39.validateMnemonic(mnemonic)) {
+            throw new Error('Invalid mnemonic');
+          } else {
+            console.log(`SatochipCommands import-seed mnemonic valid!`)
+          }
+
+          // debug
+//           const entropy = bip39.mnemonicToEntropy(mnemonic);
+//           console.log(`SatochipCommands import-seed entropy: ${entropy}`)
+
+          // Convert to seed
+          const seed = bip39.mnemonicToSeedSync(mnemonic, passphrase);
+          console.log(`SatochipCommands import-seed seed: ${seed.toString('hex')}`)
+
+          await card.importSeed(seed);
+
+          return `Seed imported successfully!`
+        }, name);
+
+        cleanup();
+        break;
+
+      case 'reset-seed':
+        withModal(async () => {
+          await card.resetSeed(inputs.get('pin'))
+          return `Seed reset successfully!`
+        }, name);
+
+        cleanup();
+        break;
+
 
 
 
@@ -213,6 +253,14 @@ const SatochipCommands = ({
       case 'get-extendedkey':
         getInputs('get-extendedkey', ['path']);
         break;
+
+      case 'import-seed':
+        getInputs('import-seed', ['mnemonic', 'passphrase']);
+        break;
+      case 'reset-seed':
+        getInputs('reset-seed', ['pin']);
+        break;
+
 
 
 
