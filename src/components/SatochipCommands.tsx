@@ -21,6 +21,9 @@ const COMMANDS = [
     'get-extendedkey',
     'import-seed',
     'reset-seed',
+    'sign-hash',
+
+
 //   'check-status',
 //   'verify-certs',
 //   'slot-usage',
@@ -126,7 +129,23 @@ const SatochipCommands = ({
         cleanup();
         break;
 
+      case 'sign-hash':
+        withModal(async () => {
+          let path = inputs.get('path') ?? `m/44'/0'/0'/0/0`;
+          console.log(`SatochipCommands sign-hash path: ${path}`)
+          const {pubkey, chaincode} = await card.getExtendedKey(path);
+          console.log(`SatochipCommands sign-hash pubkey: ${pubkey.toString('hex')}`)
+          console.log(`SatochipCommands sign-hash chaincode: ${chaincode.toString('hex')}`)
 
+          const hashString = inputs.get('hash') ?? '00'.repeat(32);
+          const hashBytes = Buffer.from(hashString, 'hex');
+          const derSig = await card.signTransactionHash(0xff, hashBytes);
+          console.log(`SatochipCommands sign-hash derSig: ${derSig.toString('hex')}`)
+          return derSig.toString('hex');
+        }, name);
+
+        cleanup();
+        break;
 
 
 //       case 'get-authentikey':
@@ -261,6 +280,9 @@ const SatochipCommands = ({
         getInputs('reset-seed', ['pin']);
         break;
 
+      case 'sign-hash':
+        getInputs('sign-hash', ['path', 'hash']);
+        break;
 
 
 
