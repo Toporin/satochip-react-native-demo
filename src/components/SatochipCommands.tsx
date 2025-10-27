@@ -14,28 +14,19 @@ import { SatochipCard } from 'satochip-react-native';
 import InputBox from './InputBox';
 
 const COMMANDS = [
-    'setup',
-    'get-status',
-    'change-pin',
-    'verify-pin',
-    'get-authentikey',
-    'get-extendedkey',
-    'import-seed',
-    'reset-seed',
-    'sign-hash',
-    'export-cert',
-    'challenge-response',
-    'validate-cert',
+  'setup',
+  'get-status',
+  'change-pin',
+  'verify-pin',
+  'get-authentikey',
+  'get-extendedkey',
+  'import-seed',
+  'reset-seed',
+  'sign-hash',
+  'export-cert',
+  'challenge-response',
+  'validate-cert',
 
-//   'check-status',
-//   'verify-certs',
-//   'slot-usage',
-//   'setup-slot',
-//   'address',
-//   'get-pubkey',
-//   'unseal-slot',
-//   'get-privkey',
-//   'wait',
   'Start Over',
 ];
 const SatochipCommands = ({
@@ -160,88 +151,6 @@ const SatochipCommands = ({
         cleanup();
         break;
 
-
-//       case 'get-authentikey':
-//         withModal(
-//           () => card.getAuthentikey(),
-//           name
-//         );
-//         cleanup();
-//         break;
-
-//       case 'setup-slot':
-//         withModal(
-//           () => card.setup(inputs.get('cvc') || cvc, undefined, true),
-//           name
-//         );
-//         cleanup();
-//         break;
-//       case 'sign':
-//         withModal(
-//           () =>
-//             card.sign_digest(inputs.get('cvc') || cvc, 0, inputs.get('digest')),
-//           name
-//         );
-//         cleanup();
-//         break;
-//       case 'change-cvc':
-//         withModal(
-//           () => card.change_cvc(inputs.get('old_cvc'), inputs.get('new_cvc')),
-//           name
-//         );
-//         cleanup();
-//         break;
-//       case 'verify-cvc':
-//         withModal(() => card.read(inputs.get('cvc') || cvc), name);
-//         cleanup();
-//         break;
-//       case 'slot-usage':
-//         withModal(async () => {
-//           const slots = [];
-//           for (let i = 0; i < 10; i++) {
-//             const slot = await card.get_slot_usage(i, inputs.get('cvc') || cvc);
-//             slots.push(slot);
-//           }
-//           return slots;
-//         }, name);
-//         cleanup();
-//         break;
-//       case 'unseal-slot':
-//         withModal(() => card.unseal_slot(inputs.get('cvc') || cvc), name);
-//         cleanup();
-//         break;
-//       case 'get-privkey':
-//         withModal(
-//           () =>
-//             card.get_privkey(
-//               inputs.get('cvc') || cvc,
-//               Number(inputs.get('slot') || card.active_slot)
-//             ),
-//           name
-//         );
-//         cleanup();
-//         break;
-//       case 'address':
-//         withModal(
-//           () =>
-//             card.address(
-//               inputs.get('faster'),
-//               inputs.get('includePubkey'),
-//               inputs.get('slot')
-//                 ? Number(inputs.get('slot'))
-//                 : inputs.get('slot')
-//             ),
-//           name
-//         );
-//         cleanup();
-//         break;
-//       case 'get-pubkey':
-//         withModal(
-//           () => card.get_pubkey(inputs.get('cvc'), inputs.get('subpath')),
-//           name
-//         );
-//         cleanup();
-//         break;
       default:
         break;
     }
@@ -322,68 +231,6 @@ const SatochipCommands = ({
         }, name);
         break;
 
-
-
-      //// TODO REMOVE
-      case 'check-status':
-        withModal(() => card.first_look(), name);
-        break;
-
-      case 'verify-certs':
-        withModal(async () => {
-          if (card.applet_version !== '0.9.0') {
-            const { pubkey } = await card.get_pubkey();
-            return card.certificate_check(pubkey);
-          } else {
-            return card.certificate_check();
-          }
-        }, name);
-        break;
-      case 'slot-usage':
-        getInputs('slot-usage', ['cvc']);
-        break;
-      case 'unseal-slot':
-        getInputs('unseal-slot', ['cvc']);
-        break;
-      case 'get-privkey':
-        getInputs('get-privkey', ['cvc', 'slot']);
-        break;
-      case 'address':
-        getInputs('address', ['faster', 'includePubkey', 'slot']);
-        break;
-      case 'get-pubkey':
-        getInputs('get-pubkey', ['cvc', 'subpath']);
-        break;
-      case 'setup-slot':
-        getInputs('setup-slot', ['cvc']);
-        break;
-      case 'sign':
-        getInputs('sign', ['cvc', 'digest']);
-        break;
-      case 'change-cvc':
-        getInputs('change-cvc', ['old_cvc', 'new_cvc']);
-        break;
-      case 'wait':
-        withModal(async () => {
-          const status = await card.first_look();
-          if (status.auth_delay) {
-            setUnlocking(true);
-            setCvc('');
-            for (let i = 0; i < status.auth_delay; i++) {
-              await card.wait();
-            }
-            setUnlocking(false);
-            return card.first_look();
-          } else return status;
-        }, name);
-        break;
-      case 'verify-cvc':
-        getInputs('verify-cvc', ['cvc']);
-        break;
-      case 'Start Over':
-        setCvc('');
-        startOver();
-        break;
       default:
         break;
     }
