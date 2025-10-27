@@ -14,6 +14,7 @@ import { SatochipCard } from 'satochip-react-native';
 import InputBox from './InputBox';
 
 const COMMANDS = [
+    'setup',
     'get-status',
     'change-pin',
     'verify-pin',
@@ -22,7 +23,9 @@ const COMMANDS = [
     'import-seed',
     'reset-seed',
     'sign-hash',
-
+    'export-cert',
+    'challenge-response',
+    'validate-cert',
 
 //   'check-status',
 //   'verify-certs',
@@ -59,19 +62,29 @@ const SatochipCommands = ({
   const interact = (cmd = '') => {
     const name = cmd ? cmd : callback;
     switch (name) {
-      case 'change-pin':
-        withModal(
-          () => card.changePIN(0, inputs.get('old_pin'), inputs.get('new_pin')),
-          name
-        );
+
+      case 'setup':
+        withModal(async () => {
+          const pin = inputs.get('new_pin');
+          await card.setup(pin);
+          return `Card setup successfully!`
+        }, name);
         cleanup();
         break;
 
       case 'verify-pin':
         withModal(async () => {
-          card.verifyPIN(0, inputs.get('pin'));
+          await card.verifyPIN(0, inputs.get('pin'));
           return `PIN verified successfully!`
         }, name);
+        cleanup();
+        break;
+
+      case 'change-pin':
+        withModal(
+          () => card.changePIN(0, inputs.get('old_pin'), inputs.get('new_pin')),
+          name
+        );
         cleanup();
         break;
 
@@ -255,17 +268,21 @@ const SatochipCommands = ({
           }, name);
           break;
 
-      case 'change-pin':
-        getInputs('change-pin', ['old_pin', 'new_pin']);
+      case 'setup':
+        getInputs('setup', ['new_pin']);
         break;
+
       case 'verify-pin':
         getInputs('verify-pin', ['pin']);
+        break;
+      case 'change-pin':
+        getInputs('change-pin', ['old_pin', 'new_pin']);
         break;
 
       case 'get-authentikey':
         withModal(async () => {
           const authentikey = await card.getAuthentikey();
-          return authentikey.getPublicKeyBytes().toString('hex'); //"TEST GET-AUTHENTIKEY"; //
+          return authentikey.getPublicKeyBytes().toString('hex');
         }, name);
         break;
 
@@ -282,6 +299,27 @@ const SatochipCommands = ({
 
       case 'sign-hash':
         getInputs('sign-hash', ['path', 'hash']);
+        break;
+
+      case 'export-cert':
+        withModal(async () => {
+          const devicePem = await card.exportPersoCertificate();
+          return devicePem;
+        }, name);
+        break;
+
+      case 'challenge-response':
+        withModal(async () => {
+          const res = await card.cardChallengeResponsePki();
+          return res;
+        }, name);
+        break;
+
+      case 'validate-cert':
+        withModal(async () => {
+          const res = await card.verifyCertificateChain();
+          return res;
+        }, name);
         break;
 
 
