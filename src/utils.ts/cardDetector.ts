@@ -1,4 +1,5 @@
-import { CKTapCard, SatochipCard } from 'satochip-react-native';
+import { SatochipCard } from 'satochip-react-native';
+import { CKTapCard } from 'cktap-protocol-react-native';
 
 export type CardType = 'TAPSIGNER' | 'SATSCARD' | 'SATOCHIP' | null;
 

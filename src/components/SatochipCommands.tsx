@@ -9,7 +9,6 @@ import React, { useContext } from 'react';
 import * as bip39 from 'bip39';
 
 import { AppContext } from '../contexts/AppContext';
-//import { CKTapCard } from 'cktap-protocol-react-native';
 import { SatochipCard } from 'satochip-react-native';
 import InputBox from './InputBox';
 
@@ -18,8 +17,12 @@ const COMMANDS = [
   'get-status',
   'change-pin',
   'verify-pin',
+  'set-label',
+  'get-label',
   'get-authentikey',
   'get-extendedkey',
+  'get-xpub',
+  'get-xfp',
   'import-seed',
   'reset-seed',
   'sign-hash',
@@ -79,17 +82,11 @@ const SatochipCommands = ({
         cleanup();
         break;
 
-      case 'get-extendedkey':
+      case 'set-label':
         withModal(async () => {
-          let path = inputs.get('path') ?? `m/44'/0'/0'/0/0`;
-          console.log(`SatochipCommands get-extendedkey path: ${path}`)
-          const {pubkey, chaincode} = await card.getExtendedKey(path);
-          console.log(`SatochipCommands get-extendedkey pubkey: ${pubkey.toString('hex')}`)
-          console.log(`SatochipCommands get-extendedkey chaincode: ${chaincode.toString('hex')}`)
-          return `Pubkey: ${pubkey.toString('hex')} \nChaincode: ${chaincode.toString('hex')}`;
-          //return `Pubkey: ${pubkey.toString('hex')}`;
+          await card.setLabel(inputs.get('label'));
+          return `Label set successfully!`;
         }, name);
-
         cleanup();
         break;
 
@@ -132,6 +129,30 @@ const SatochipCommands = ({
 
         cleanup();
         break;
+
+      case 'get-extendedkey':
+        withModal(async () => {
+          let path = inputs.get('path') ?? `m/44'/0'/0'/0/0`;
+          console.log(`SatochipCommands get-extendedkey path: ${path}`)
+          const {pubkey, chaincode} = await card.getExtendedKey(path);
+          console.log(`SatochipCommands get-extendedkey pubkey: ${pubkey.toString('hex')}`)
+          console.log(`SatochipCommands get-extendedkey chaincode: ${chaincode.toString('hex')}`)
+          return `Pubkey: ${pubkey.toString('hex')} \nChaincode: ${chaincode.toString('hex')}`;
+          //return `Pubkey: ${pubkey.toString('hex')}`;
+        }, name);
+        cleanup();
+        break;
+
+      case 'get-xpub':
+        withModal(async () => {
+          const path = inputs.get('path') ?? `m/44'/0'/0'/0`;
+          console.log(`SatochipCommands get-xpub path: ${path}`)
+          const xpub = await card.getXpub(path)
+          return xpub
+        }, name);
+        cleanup();
+        break;
+
 
       case 'sign-hash':
         withModal(async () => {
@@ -187,6 +208,15 @@ const SatochipCommands = ({
       case 'change-pin':
         getInputs('change-pin', ['old_pin', 'new_pin']);
         break;
+      case 'get-label':
+        withModal(async () => {
+          const label = await card.getLabel();
+          return label;
+        }, name);
+        break;
+      case 'set-label':
+        getInputs('set-label', ['label']);
+        break;
 
       case 'get-authentikey':
         withModal(async () => {
@@ -195,15 +225,23 @@ const SatochipCommands = ({
         }, name);
         break;
 
-      case 'get-extendedkey':
-        getInputs('get-extendedkey', ['path']);
-        break;
-
       case 'import-seed':
         getInputs('import-seed', ['mnemonic', 'passphrase']);
         break;
       case 'reset-seed':
         getInputs('reset-seed', ['pin']);
+        break;
+      case 'get-extendedkey':
+        getInputs('get-extendedkey', ['path']);
+        break;
+      case 'get-xpub':
+        getInputs('get-xpub', ['path']);
+        break;
+      case 'get-xfp':
+        withModal(async () => {
+          const xfp = await card.getMasterXfp();
+          return xfp;
+        }, name);
         break;
 
       case 'sign-hash':
@@ -229,6 +267,10 @@ const SatochipCommands = ({
           const res = await card.verifyCertificateChain();
           return res;
         }, name);
+        break;
+
+      case 'Start Over':
+        startOver();
         break;
 
       default:

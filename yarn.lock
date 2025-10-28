@@ -7902,7 +7902,6 @@ sane@^4.0.3:
 "satochip-react-native@file:../../goose/satochip-react-native":
   version "0.0.1"
   dependencies:
-    "@ellipticoin/cbor" "^1.0.4"
     "@peculiar/webcrypto" "^1.5.0"
     "@peculiar/x509" "^1.14.0"
     bech32 "2.0.0"
